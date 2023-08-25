@@ -5,6 +5,7 @@ use JSON::Class;
 use Metron::Global;
 
 use Metron::ArcList;
+use Metron::Base;
 use Metron::Character;
 use Metron::Credit;
 use Metron::Publisher;
@@ -14,7 +15,7 @@ use Metron::Series;
 use Metron::Team;
 use Metron::VariantsIssue;
 
-class Metron::Issue does JSON::Class {
+class Metron::Issue is Metron::Base does JSON::Class {
   has Int                   $.id           is rw;
   has Metron::Publisher     $.publisher    is rw;
   has Metron::Series        $.series       is rw;
@@ -41,4 +42,23 @@ class Metron::Issue does JSON::Class {
   has Int                   $.cv_id        is rw;
   has Str                   $.resource_url is rw;
   has DateTime              $.modified     is rw  is json-date-time;
+
+  method new ($http) {
+    X::Metron::InvalidClient.new.throw
+      unless $http ~~ Cro::HTTP::Client;
+
+    self.bless( :$http );
+  }
+
+  multi method new ($http, :$upc is required) {
+    return Nil unless $upc;
+
+    # cw: Check the cloud for the upc
+    my $r = await $http.get(
+      "{ PREFIX }/api/issue?upc={ $upc }",
+    );
+
+    ::?CLASS.from-json(await $r.body);
+  }
+
 }

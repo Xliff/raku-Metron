@@ -2,14 +2,26 @@ use v6;
 
 use DateTime::Parse;
 
+constant PREFIX = 'metron.cloud/api/';
+
+class X::Metron::InvalidClient is Exception {
+  method message {
+    'REST Client value must be Cro::HTTP::Client-compatible!'
+  }
+}
+
 role Metron::Roles::DateTimeDeserializer {
 
   method json-unmarshal ($v) {
     return DateTime unless $v;
+
     my $dt = DateTime.new($v);
-    say "V: $v";
     return $dt if $dt && $dt ~~ DateTime;
-    DateTime::Parse.new($v);
+
+    $dt = try DateTime::Parse.new($v);
+    return $dt if $dt && $dt ~~ DateTime;
+
+    DateTime;
   }
 
 }
