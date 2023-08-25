@@ -1,10 +1,11 @@
 use JSON::Class;
 
+use Metron::Base;
 use Metron::Global;
 
 use Metron::Creator;
 
-class Metron::Team does JSON::Class {
+class Metron::Team is Metron::Base does JSON::Class {
   has Int             $.id            is rw;
   has Str             $.name          is rw;
   has Str             $.desc          is rw;

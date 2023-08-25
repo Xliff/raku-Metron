@@ -3,12 +3,17 @@ use v6;
 use Metron::Global;
 
 class Metron::Base {
+  method make-rest-call ($http, $uri, \C = ::?CLASS) {
+    my $r = await $http.get($uri);
+
+    C.from-json(await $r);
+  }
+
   multi method new ($http, :$uri is required) {
-    my $r = await $http.get(
+    self.make-rest-request(
+      $http,
       "{ PREFIX }/{ ::?CLASS.^shortname.lc }/{ $uri }"
     );
-
-    ::?CLASS.from-json(await $r);
   }
 
   multi method new ($http, :$id is required) {

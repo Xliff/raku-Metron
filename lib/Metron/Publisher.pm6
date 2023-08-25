@@ -1,8 +1,27 @@
+use v6.c;
+
 use JSON::Class;
 
+use Metron::Base;
 use Metron::Global;
 
-class Metron::Publisher does JSON::Class {
+class Metron::Publiser::Series::List does JSON::Class {
+  has Int      $.id          is rw;
+  has Str      $.series      is rw;
+  has Int      $.year_began  is rw;
+  has Int      $.issue_count is rw;
+  has DateTime $.modified    is rw does json-date-time;
+}
+
+class Metron::Publisher::SeriesList::Response
+  is   Metron::Base
+  does Metron::Roles::REST::Request
+  does JSON::Class
+{
+  has Metron::Publisher::Series::List @.results;
+}
+
+class Metron::Publisher is Metron::Base does JSON::Class {
   has Int      $.id           is rw;
   has Str      $.name         is rw;
   has Int      $.founded      is rw;
@@ -11,7 +30,17 @@ class Metron::Publisher does JSON::Class {
   has Int      $.cv_id        is rw;
   has Str      $.resource_url is rw;
   has DateTime $.modified     is rw  is json-date-time;
+
+  method get-titles ($http) {
+    self.make-rest-call(
+      $http,
+      'series_list',
+      Metron::Publisher::Series::Response
+    );
+  }
+
 }
+
 
 sub Publisher_MAIN is export {
   Metron::Publisher.from-json( q:to/JSON/ ).gist.say;

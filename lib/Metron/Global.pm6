@@ -4,6 +4,12 @@ use DateTime::Parse;
 
 constant PREFIX = 'metron.cloud/api/';
 
+role Metron::Roles::RestRequest {
+  has Int $.count    is rw;
+  has Str $.next     is rw;
+  has Str $.previous is rw;
+}
+
 class X::Metron::InvalidClient is Exception {
   method message {
     'REST Client value must be Cro::HTTP::Client-compatible!'
