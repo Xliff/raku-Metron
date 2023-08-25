@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ "$1" = "--debug" ]; then
+  echo "Running perl6 script in debug mode..."
+  EXEC=perl6-gdb-m
+  shift
+elif [ "$1" = "--valgrind" ]; then
+  echo "Running perl6 script in valgrind mode..."
+  EXEC=perl6-valgrind-m
+  shift
+elif [ "$1" = "--rr" ]; then
+  EXEC=rr
+  shift
+elif [ "$1" = "--pbuild" ]; then
+  PARALLEL_BUILD=1
+  EXEC=raku
+  shift
+else
+  #echo "Running perl6 script..."
+  EXEC=raku
+fi
+
+INCLUDES="\
+-I../datetime-parse/lib \
+-I../JSON-Unmarshal/lib \
+-I../JSON-Name/lib      \
+-I../JSON-Class/lib     \
+-Ilib"
+
+${EXEC} --stagestats ${EXTRAS} ${INCLUDES} "$@" 2>&1
